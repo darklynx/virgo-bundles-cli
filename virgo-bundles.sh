@@ -66,6 +66,25 @@ if [ "${VERBOSE}" = "true" ]; then
 	SILENT=""
 fi
 
+# Auto-detect bundle region
+case ${BUNDLE_TYPE} in
+bundle)
+	BUNDLE_REGION=org.eclipse.virgo.region.user
+	;;
+plan)
+	BUNDLE_REGION=global
+	;;
+par)
+	BUNDLE_REGION=global
+	;;
+configuration)
+	BUNDLE_REGION=global
+	;;
+*)
+	echo "Error: unsupported bundle type '${BUNDLE_TYPE}'"
+	exit 1
+esac
+
 ############################################
 # Upload and deploy bundle
 if [ "${COMMAND}" = "deploy" ]; then
@@ -98,14 +117,15 @@ if [ "${COMMAND}" = "deploy" ]; then
 		echo "Details: unexpected format of result: ${RESULT}"
 		exit 2
 	else
-		if [ -z "`echo ${MESSAGE} | grep ".* deployed as bundle .*"`" ]; then
+		if [ -z "`echo ${MESSAGE} | grep ".* deployed as .*"`" ]; then
 			echo "Failure"
 			echo "Details: ${MESSAGE}"
 			exit 2
 		else
-			DEPLOYED_NAME=`echo ${MESSAGE} | grep -oEi "as bundle - .+:" | cut -c 13- | rev | cut -c 2- | rev`
-			DEPLOYED_VERSION=`echo ${MESSAGE} | grep -oEi ": .+" | cut -c 3-`
-			echo "Deployed: name=${DEPLOYED_NAME}, version=${DEPLOYED_VERSION}"
+			DEPLOYED_NAME=`echo ${MESSAGE} | grep -oEi " - (.+):" | cut -c 4- | rev | cut -c 2- | rev`
+			DEPLOYED_VERSION=`echo ${MESSAGE} | grep -oEi ": (.+)" | cut -c 3-`
+			DEPLOYED_TYPE=`echo ${MESSAGE} | grep -oEi "deployed as (.+) - " | cut -c 13- | rev | cut -c 4- | rev`
+			echo "Deployed: name=${DEPLOYED_NAME}, version=${DEPLOYED_VERSION}, type=${DEPLOYED_TYPE}"
 		fi
 	fi
 	
@@ -126,7 +146,7 @@ elif [ "${COMMAND}" = "status" ]; then
 	fi
 	
 	# command
-	RESULT=`curl ${SILENT} -u ${VIRGO_USER} ${VIRGO_URL}/admin/jolokia/read/org.eclipse.virgo.kernel:artifact-type=${BUNDLE_TYPE},name=${BUNDLE_NAME},region=org.eclipse.virgo.region.user,type=ArtifactModel,version=${BUNDLE_VERSION}`	
+	RESULT=`curl ${SILENT} -u ${VIRGO_USER} ${VIRGO_URL}/admin/jolokia/read/org.eclipse.virgo.kernel:artifact-type=${BUNDLE_TYPE},name=${BUNDLE_NAME},region=${BUNDLE_REGION},type=ArtifactModel,version=${BUNDLE_VERSION}`	
 	
 	if [ "${VERBOSE}" = "true" ]; then
 		echo "-------------------------"
@@ -162,11 +182,11 @@ elif [[ "${COMMAND}" = "stop" || "${COMMAND}" = "start" || "${COMMAND}" = "unins
 	fi
 	
 	if [ "${VERBOSE}" = "true" ]; then
-		echo "Stopping bundle: ${BUNDLE_NAME} version: ${BUNDLE_VERSION}"
+		echo "Executing command: ${COMMAND} for bundle: ${BUNDLE_NAME} version: ${BUNDLE_VERSION}"
 	fi
 	
 	# command
-	RESULT=`curl ${SILENT} -u ${VIRGO_USER} ${VIRGO_URL}/admin/jolokia/exec/org.eclipse.virgo.kernel:artifact-type=${BUNDLE_TYPE},name=${BUNDLE_NAME},region=org.eclipse.virgo.region.user,type=ArtifactModel,version=${BUNDLE_VERSION}/${COMMAND}`
+	RESULT=`curl ${SILENT} -u ${VIRGO_USER} ${VIRGO_URL}/admin/jolokia/exec/org.eclipse.virgo.kernel:artifact-type=${BUNDLE_TYPE},name=${BUNDLE_NAME},region=${BUNDLE_REGION},type=ArtifactModel,version=${BUNDLE_VERSION}/${COMMAND}`
 
 	if [ "${VERBOSE}" = "true" ]; then
 		echo "-------------------------"
@@ -208,7 +228,7 @@ elif [[ "${COMMAND}" = "stop" || "${COMMAND}" = "start" || "${COMMAND}" = "unins
 # Display help
 else
 	if [[ "${COMMAND}" != "help" && "${COMMAND}" != "" ]]; then
-		echo "Error: unknown command /${COMMAND}/"
+		echo "Error: unknown command '${COMMAND}'"
 	fi
 	echo "Virgo OSGi bundels management tool. Version ${VERSION}"
 	echo
@@ -228,7 +248,7 @@ else
 	echo "  -f <path>  - location of OSGi bundle to upload, e.g. /opt/repo/org.slf4j.api-1.7.2.jar"
 	echo "  -n <name>  - bundle symbolic name, e.g. org.slf4j.api"
 	echo "  -v <ver>   - bundle version, e.g. 1.7.2"
-	echo "  -t <type>  - bundle type, possible types: bundle, plan, ??"
+	echo "  -t <type>  - bundle type, possible types: bundle, plan, par, configuration"
 	echo "  -user <*>  - user name and password for basic auth, e.g. admin:passwd"
 	echo "  -url <*>   - Virgo server URL, e.g. http://virgo.internal:7070"
 	echo "  -verbose   - enable verbose output"
