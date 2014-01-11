@@ -164,8 +164,13 @@ elif [ "${COMMAND}" = "status" ]; then
 		BUNDLE_STATE=`echo "$RESULT" | grep -oPi ",\"State\":\".+?\"," | cut -c 11- | rev | cut -c 3- | rev`
 		echo "Bundle state: ${BUNDLE_STATE}"
 	else
+		MESSAGE=`echo "$RESULT" | grep -oPi "\"error\":\".+?\"" | cut -c 10- | rev | cut -c 2- | rev`
+		if [ -z "${MESSAGE}" ]; then
+			MESSAGE=${RESULT}
+		fi
+		
 		echo "Failure"
-		echo "Details: ${RESULT}"
+		echo "Details: ${MESSAGE}"
 		exit 2
 	fi
 	
@@ -219,8 +224,13 @@ elif [[ "${COMMAND}" = "stop" || "${COMMAND}" = "start" || "${COMMAND}" = "unins
 			;;
 		esac
 	else
+		MESSAGE=`echo "$RESULT" | grep -oPi "\"error\":\".+?\"" | cut -c 10- | rev | cut -c 2- | rev`
+		if [ -z "${MESSAGE}" ]; then
+			MESSAGE=${RESULT}
+		fi
+		
 		echo "Failure"
-		echo "Details: ${RESULT}"
+		echo "Details: ${MESSAGE}"
 		exit 2
 	fi
 
