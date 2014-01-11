@@ -3,13 +3,13 @@
 ###########################################################
 #
 #  CLI tool to manage Virgo OSGi bundles
-#  Version: 1.0.0
+#  Version: 1.0.3
 #
 #  License: MIT (see http://choosealicense.com/licenses/mit/)
 #  Author: Vladimir Lyubitelev
 #
 
-VERSION=1.0.0
+VERSION=1.0.3
 VIRGO_URL=http://localhost:8080
 VIRGO_USER=admin:springsource
 
