@@ -36,7 +36,7 @@ Following options are supported by script:
 * `-n` _name_ - bundle symbolic name, e.g. org.slf4j.api
 * `-v` _version_ - bundle version, e.g. 1.7.2
 * `-t` _type_ - bundle type, possible types: bundle, plan, par, configuration, default: **bundle**
-* `-user` _auth_ - user name and password for basic auth, e.g. admin:passwd
+* `-user` _auth_ - user name and password for basic auth, e.g. admin:passwd (will be prompted if not given)
 * `-url` _url_ - Virgo server URL, e.g. http://virgo.internal:7070
 * `-verbose` - enable verbose output
 

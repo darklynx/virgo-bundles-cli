@@ -11,7 +11,6 @@
 
 VERSION=1.0.3
 VIRGO_URL=http://localhost:8080
-VIRGO_USER=admin:springsource
 
 BUNDLE_FILE=
 BUNDLE_NAME=
@@ -60,6 +59,20 @@ while (($# > 0)); do
 	esac
 	shift
 done
+
+if [ "$COMMAND" != "help" ]; then
+	if [ ! $VIRGO_USER ]; then
+		echo -n "Username [admin]: "
+		read USERNAME
+		if [ ! $USERNAME ]; then
+			USERNAME=admin
+		fi
+		echo -n "Password: "
+		read -s PASSWORD
+		echo # calling 'read' with -s doesn't issue a newline
+		VIRGO_USER=${USERNAME}:${PASSWORD}
+	fi
+fi
 
 SILENT="-s"
 if [ "${VERBOSE}" = "true" ]; then
@@ -259,7 +272,7 @@ else
 	echo "  -n <name>  - bundle symbolic name, e.g. org.slf4j.api"
 	echo "  -v <ver>   - bundle version, e.g. 1.7.2"
 	echo "  -t <type>  - bundle type, possible types: bundle, plan, par, configuration"
-	echo "  -user <*>  - user name and password for basic auth, e.g. admin:passwd"
+	echo "  -user <*>  - user name and password for basic auth, e.g. admin:passwd (will be prompted if not given)"
 	echo "  -url <*>   - Virgo server URL, e.g. http://virgo.internal:7070"
 	echo "  -verbose   - enable verbose output"
 	echo
