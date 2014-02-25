@@ -23,6 +23,10 @@ VERBOSE=false
 COMMAND=$1
 shift
 
+if [ -z "${COMMAND}" ]; then
+	COMMAND=help
+fi
+
 # Parse arguments
 while (($# > 0)); do
 	case $1 in
@@ -60,7 +64,7 @@ while (($# > 0)); do
 	shift
 done
 
-if [[ "${COMMAND}" != "help" && "${COMMAND}" != "" ]]; then
+if [ "${COMMAND}" != "help" ]; then
 	if [ ! $SDMSERVER_USER ]; then
 		echo -n "Username [admin]: "
 		read USERNAME
@@ -222,7 +226,7 @@ elif [[ "${COMMAND}" = "stop" || "${COMMAND}" = "start" || "${COMMAND}" = "unins
 ############################################
 # Display help
 else
-	if [[ "${COMMAND}" != "help" && "${COMMAND}" != "" ]]; then
+	if [ "${COMMAND}" != "help" ]; then
 		echo "Error: unknown command '${COMMAND}'"
 	fi
 	echo "SpringSource dm Server OSGi bundels management tool."
