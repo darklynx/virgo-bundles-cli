@@ -83,9 +83,10 @@ if [ "${VERBOSE}" = "true" ]; then
 	SILENT=""
 fi
 
+case ${COMMAND} in
 ############################################
 # Upload and deploy bundle
-if [ "${COMMAND}" = "deploy" ]; then
+deploy)
 	if [ -z "${BUNDLE_FILE}" ]; then
 		echo "Error: location of OSGi bundle is not specified, use option -f"
 		exit 1
@@ -123,10 +124,10 @@ if [ "${COMMAND}" = "deploy" ]; then
 			echo "${MESSAGE}"
 		fi
 	fi
-	
+	;;
 ############################################
 # Check bundle status
-elif [ "${COMMAND}" = "status" ]; then
+status)
 	if [ -z "${BUNDLE_NAME}" ]; then
 		echo "Error: bundle symbolic name is not specified, use option -n"
 		exit 1
@@ -162,10 +163,10 @@ elif [ "${COMMAND}" = "status" ]; then
 	else
 		echo "Bundle state: ${BUNDLE_STATE}"
 	fi
-	
+	;;
 ############################################
 # Execute command: stop, start, uninstall, refresh
-elif [[ "${COMMAND}" = "stop" || "${COMMAND}" = "start" || "${COMMAND}" = "uninstall" || "${COMMAND}" = "refresh" ]]; then
+stop|start|uninstall|refresh)
 	if [ -z "${BUNDLE_NAME}" ]; then
 		echo "Error: bundle symbolic name is not specified, use option -n"
 		exit 1
@@ -222,10 +223,10 @@ elif [[ "${COMMAND}" = "stop" || "${COMMAND}" = "start" || "${COMMAND}" = "unins
 		esac
 		echo "Details: ${MESSAGE}"
 	fi
-
+	;;
 ############################################
 # Display help
-else
+*)
 	if [ "${COMMAND}" != "help" ]; then
 		echo "Error: unknown command '${COMMAND}'"
 	fi
@@ -260,4 +261,5 @@ else
 	echo "  $0 start -n test-bundle -v 1.0.0.SNAPSHOT -verbose"
 	echo "  $0 uninstall -n test-bundle -v 1.0.0.SNAPSHOT"
 	echo "  $0 status -n test-plan -v 2.0.0 -t plan"
-fi
+	;;
+esac

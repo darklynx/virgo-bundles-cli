@@ -102,9 +102,10 @@ configuration)
 	exit 1
 esac
 
+case ${COMMAND} in
 ############################################
 # Upload and deploy bundle
-if [ "${COMMAND}" = "deploy" ]; then
+deploy)
 	if [ -z "${BUNDLE_FILE}" ]; then
 		echo "Error: location of OSGi bundle is not specified, use option -f"
 		exit 1
@@ -145,10 +146,10 @@ if [ "${COMMAND}" = "deploy" ]; then
 			echo "Deployed: name=${DEPLOYED_NAME}, version=${DEPLOYED_VERSION}, type=${DEPLOYED_TYPE}"
 		fi
 	fi
-	
+	;;
 ############################################
 # Check bundle status
-elif [ "${COMMAND}" = "status" ]; then
+status)
 	if [ -z "${BUNDLE_NAME}" ]; then
 		echo "Error: bundle symbolic name is not specified, use option -n"
 		exit 1
@@ -190,10 +191,10 @@ elif [ "${COMMAND}" = "status" ]; then
 		echo "Details: ${MESSAGE}"
 		exit 2
 	fi
-	
+	;;
 ############################################
 # Execute command: stop, start, uninstall, refresh
-elif [[ "${COMMAND}" = "stop" || "${COMMAND}" = "start" || "${COMMAND}" = "uninstall" || "${COMMAND}" = "refresh" ]]; then
+stop|start|uninstall|refresh)
 	if [ -z "${BUNDLE_NAME}" ]; then
 		echo "Error: bundle symbolic name is not specified, use option -n"
 		exit 1
@@ -250,10 +251,10 @@ elif [[ "${COMMAND}" = "stop" || "${COMMAND}" = "start" || "${COMMAND}" = "unins
 		echo "Details: ${MESSAGE}"
 		exit 2
 	fi
-
+	;;
 ############################################
 # Display help
-else
+*)
 	if [ "${COMMAND}" != "help" ]; then
 		echo "Error: unknown command '${COMMAND}'"
 	fi
@@ -286,4 +287,5 @@ else
 	echo "  $0 stop -n virgo-test -v 1.0.0.SNAPSHOT -url http://localhost:8081"
 	echo "  $0 start -n virgo-test -v 1.0.0.SNAPSHOT -verbose"
 	echo "  $0 uninstall -n virgo-test -v 1.0.0.SNAPSHOT"
-fi
+	;;
+esac
