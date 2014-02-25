@@ -60,7 +60,7 @@ while (($# > 0)); do
 	shift
 done
 
-if [ "$COMMAND" != "help" ]; then
+if [[ "${COMMAND}" != "help" && "${COMMAND}" != "" ]]; then
 	if [ ! $SDMSERVER_USER ]; then
 		echo -n "Username [admin]: "
 		read USERNAME
