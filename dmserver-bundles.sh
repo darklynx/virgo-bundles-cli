@@ -64,7 +64,9 @@ while (($# > 0)); do
 	shift
 done
 
-if [ "${COMMAND}" != "help" ]; then
+# Request user/password for relevant commands
+case ${COMMAND} in
+deploy|status|stop|start|uninstall|refresh)
 	if [ ! $SDMSERVER_USER ]; then
 		echo -n "Username [admin]: "
 		read USERNAME
@@ -76,7 +78,7 @@ if [ "${COMMAND}" != "help" ]; then
 		echo # calling 'read' with -s doesn't issue a newline
 		SDMSERVER_USER=${USERNAME}:${PASSWORD}
 	fi
-fi
+esac
 
 SILENT="-s"
 if [ "${VERBOSE}" = "true" ]; then
@@ -229,6 +231,7 @@ stop|start|uninstall|refresh)
 *)
 	if [ "${COMMAND}" != "help" ]; then
 		echo "Error: unknown command '${COMMAND}'"
+		echo
 	fi
 	echo "SpringSource dm Server OSGi bundels management tool."
 	echo "Version ${VERSION}"
