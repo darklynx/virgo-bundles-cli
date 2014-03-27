@@ -26,6 +26,7 @@ Script supports following commands:
 * `start` - start bundle at Virgo server, required options: `-n`, `-v`
 * `refresh` - refresh bundle at Virgo server, required options: `-n`, `-v`
 * `uninstall` - uninstall bundle from Virgo server, required options: `-n`, `-v`
+* `list` - list bundles deployed at Virgo server, optional filter options: `-n`, `-t`, `-v` (only Virgo)
 * `help` - display help information
 
 ### Options
