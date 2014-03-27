@@ -3,13 +3,13 @@
 ###########################################################
 #
 #  CLI tool to manage SpringSource dm Server OSGi bundles
-#  Version: 1.0.0
+#  Version: 1.0.1
 #
 #  License: MIT (see http://choosealicense.com/licenses/mit/)
 #  Author: Vladimir Lyubitelev
 #
 
-VERSION=1.0.0
+VERSION=1.0.1
 SDMSERVER_URL=http://localhost:8080
 
 BUNDLE_FILE=
@@ -66,11 +66,11 @@ done
 
 # Request user/password for relevant commands
 case ${COMMAND} in
-deploy|status|stop|start|uninstall|refresh)
-	if [ ! $SDMSERVER_USER ]; then
+deploy|status|stop|start|uninstall|refresh|list)
+	if [ -z "$SDMSERVER_USER" ]; then
 		echo -n "Username [admin]: "
 		read USERNAME
-		if [ ! $USERNAME ]; then
+		if [ -z "$USERNAME" ]; then
 			USERNAME=admin
 		fi
 		echo -n "Password: "
@@ -167,6 +167,40 @@ status)
 	fi
 	;;
 ############################################
+# List bundles
+list)
+	# command
+	RESULT=`curl ${SILENT} -u ${SDMSERVER_USER} ${SDMSERVER_URL}/admin/web/artifact/data?parent=${BUNDLE_TYPE}\&type=${BUNDLE_TYPE}\&start=0`
+
+	if [ "${VERBOSE}" = "true" ]; then
+		echo "-------------------------"
+		echo "dm Server response: ${RESULT}"
+		echo "-------------------------"
+	fi
+	
+	# extract result
+	RESULT=`echo "$RESULT" | grep -oEi "items\: \[ \{.*\}\]\}" | cut -c 11- | rev | cut -c 4- | rev`
+	
+	if [ -z "${RESULT}" ]; then
+		echo "Failure"
+		echo "Details: received empty result"
+		exit 2
+	else
+		# format, filter and print result
+		FILTER_NAME=""
+		if [ ! -z "${BUNDLE_NAME}" ]; then
+			FILTER_NAME="name=${BUNDLE_NAME},"
+		fi
+		FILTER_VERSION=""
+		if [ ! -z "${BUNDLE_VERSION}" ]; then
+			FILTER_VERSION="version=${BUNDLE_VERSION},"
+		fi
+	
+		echo "$RESULT" | sed -e 's/},{/\'$'\n/g' | awk -F"[:', ]" '{ print "name=" $20 ", version=" $25 ", type=" $15 }' | grep "${FILTER_NAME}" | grep "${FILTER_VERSION}"
+	fi
+	
+	;;
+############################################
 # Execute command: stop, start, uninstall, refresh
 stop|start|uninstall|refresh)
 	if [ -z "${BUNDLE_NAME}" ]; then
@@ -246,6 +280,7 @@ stop|start|uninstall|refresh)
 	echo "  start      - start bundle at dm Server, required options: -n, -v"
 	echo "  refresh    - refresh bundle at dm Server, required options: -n, -v"
 	echo "  uninstall  - uninstall bundle from dm Server, required options: -n, -v"
+	echo "  list       - list bundles deployed at Virgo server, optional filter options: -n, -v, -t"
 	echo "  help       - display this help"
 	echo
 	echo "Options:"
