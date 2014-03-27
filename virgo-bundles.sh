@@ -230,7 +230,7 @@ list)
 			FILTER_VERSION="version=${BUNDLE_VERSION},"
 		fi
 	
-		echo "$RESULT" | sed -e 's/","/"\n"/g' | awk -F'["=,]' '{ print "name=" $5 ", version=" $11 ", type=" $3 ", region=" $7 }' | grep "${FILTER_TYPE}" | grep "${FILTER_NAME}" | grep "${FILTER_VERSION}"
+		echo "$RESULT" | sed -e 's/\",\"/\"\'$'\n\"/g' | awk -F'["=,]' '{ print "name=" $5 ", version=" $11 ", type=" $3 ", region=" $7 }' | grep "${FILTER_TYPE}" | grep "${FILTER_NAME}" | grep "${FILTER_VERSION}"
 	fi
 	
 	;;
