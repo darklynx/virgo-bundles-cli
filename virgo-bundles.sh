@@ -3,19 +3,20 @@
 ###########################################################
 #
 #  CLI tool to manage Virgo OSGi bundles
-#  Version: 1.0.3
+#  Version: 1.0.4
 #
 #  License: MIT (see http://choosealicense.com/licenses/mit/)
 #  Author: Vladimir Lyubitelev
 #
 
-VERSION=1.0.3
+VERSION=1.0.4
 VIRGO_URL=http://localhost:8080
 
 BUNDLE_FILE=
 BUNDLE_NAME=
 BUNDLE_VERSION=
 BUNDLE_TYPE=bundle
+BUNDLE_CUSTOM_TYPE=
 
 VERBOSE=false
 
@@ -44,6 +45,7 @@ while (($# > 0)); do
 		;;
 	-t)
 		BUNDLE_TYPE=$2
+		BUNDLE_CUSTOM_TYPE=$2
 		shift;
 		;;
 	-user)
@@ -66,11 +68,11 @@ done
 
 # Request user/password for relevant commands
 case ${COMMAND} in
-deploy|status|stop|start|uninstall|refresh)
-	if [ ! $VIRGO_USER ]; then
+deploy|status|stop|start|uninstall|refresh|list)
+	if [ -z "$VIRGO_USER" ]; then
 		echo -n "Username [admin]: "
 		read USERNAME
-		if [ ! $USERNAME ]; then
+		if [ -z "$USERNAME" ]; then
 			USERNAME=admin
 		fi
 		echo -n "Password: "
@@ -195,6 +197,44 @@ status)
 	fi
 	;;
 ############################################
+# List bundles
+list)
+	# command
+	RESULT=`curl ${SILENT} -u ${VIRGO_USER} ${VIRGO_URL}/admin/jolokia/search/org.eclipse.virgo.kernel:type=ArtifactModel,*`
+	
+	if [ "${VERBOSE}" = "true" ]; then
+		echo "-------------------------"
+		echo "Virgo response: ${RESULT}"
+		echo "-------------------------"
+	fi
+	
+	# extract result
+	RESULT=`echo "$RESULT" | grep -oEi "\"value\":\[.*\]" | cut -c 10- | rev | cut -c 2- | rev`
+	
+	if [ -z "${RESULT}" ]; then
+		echo "Failure"
+		echo "Details: received empty result"
+		exit 2
+	else
+		# format, filter and print result
+		FILTER_TYPE=""
+		if [ ! -z "${BUNDLE_CUSTOM_TYPE}" ]; then
+			FILTER_TYPE="type=${BUNDLE_CUSTOM_TYPE},"
+		fi
+		FILTER_NAME=""
+		if [ ! -z "${BUNDLE_NAME}" ]; then
+			FILTER_NAME="name=${BUNDLE_NAME},"
+		fi
+		FILTER_VERSION=""
+		if [ ! -z "${BUNDLE_VERSION}" ]; then
+			FILTER_VERSION="version=${BUNDLE_VERSION},"
+		fi
+	
+		echo "$RESULT" | sed -e 's/","/"\n"/g' | awk -F'["=,]' '{ print "name=" $5 ", version=" $11 ", type=" $3 ", region=" $7 }' | grep "${FILTER_TYPE}" | grep "${FILTER_NAME}" | grep "${FILTER_VERSION}"
+	fi
+	
+	;;
+############################################
 # Execute command: stop, start, uninstall, refresh
 stop|start|uninstall|refresh)
 	if [ -z "${BUNDLE_NAME}" ]; then
@@ -273,6 +313,7 @@ stop|start|uninstall|refresh)
 	echo "  start      - start bundle at Virgo server, required options: -n, -v"
 	echo "  refresh    - refresh bundle at Virgo server, required options: -n, -v"
 	echo "  uninstall  - uninstall bundle from Virgo server, required options: -n, -v"
+	echo "  list       - list bundles deployed at Virgo server, optional filter options: -n, -v, -t"
 	echo "  help       - display this help"
 	echo
 	echo "Options:"
