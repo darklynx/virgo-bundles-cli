@@ -73,4 +73,4 @@ Uninstall deployed bundle:
 * [Virgo from EclipseRT](http://www.eclipse.org/virgo/) official web site
 * [Continuous Deployment with Docker and Virgo](http://eclipsesource.com/blogs/2013/10/25/continuous-deployment-with-docker-and-virgo/)
 * [UploadServlet.java](https://eclipse.googlesource.com/virgo/org.eclipse.virgo.kernel/+/3.6.x/org.eclipse.virgo.management.console/src/main/java/org/eclipse/virgo/management/console/UploadServlet.java) from Virgo management console
-* [Lates version of SpringSource dm Server](http://dist.springframework.org/release/DMS/springsource-dm-server-2.0.5.RELEASE.zip)
+* [Latest version of SpringSource dm Server](http://dist.springframework.org/release/DMS/springsource-dm-server-2.0.5.RELEASE.zip)
