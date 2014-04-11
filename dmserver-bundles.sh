@@ -196,7 +196,7 @@ list)
 			FILTER_VERSION="version=${BUNDLE_VERSION},"
 		fi
 	
-		echo "$RESULT" | sed -e 's/},{/\'$'\n/g' | awk -F"[:', ]" '{ print "name=" $20 ", version=" $25 ", type=" $15 }' | grep "${FILTER_NAME}" | grep "${FILTER_VERSION}"
+		echo "$RESULT" | sed -e "s/},{/\'$\'\n/g" | awk -F"[:', ]" '{ print "name=" $20 ", version=" $25 ", type=" $15 }' | grep "${FILTER_NAME}" | grep "${FILTER_VERSION}"
 	fi
 	
 	;;
