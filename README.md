@@ -1,13 +1,13 @@
 # Virgo OSGi bundles CLI
 
-CLI tool to manage Virgo OSGi bundles.
+Command line tool for Virgo OSGi server management and automation.
 
-These bash scripts will allow you upload, deploy and manage OSGi bundles at [Virgo OSGi server](http://www.eclipse.org/virgo/) and legacy [SpringSource dm Server](http://docs.spring.io/s2-dmserver/2.0.5.RELEASE/user-guide/htmlsingle/user-guide.html).
+These bash scripts allow you upload, deploy and manage OSGi bundles at [Virgo OSGi server](http://www.eclipse.org/virgo/) and legacy [SpringSource dm Server](http://docs.spring.io/s2-dmserver/2.0.5.RELEASE/user-guide/htmlsingle/user-guide.html).
 
 
 ## Getting Started
 
-This project provides 2 scripts to manage OSGi bundles at different servers:
+This project provides 2 scripts to manage OSGi bundles at:
 
 * `virgo-bundles.sh` - Virgo OSGi server from EclipseRT
 * `dmserver-bundles.sh` - SpringSource dm Server (legacy)
@@ -18,7 +18,7 @@ Use following format to run scripts:
 
 ### Commands
 
-Script supports following commands:
+Scripts support following commands:
 
 * `deploy` - upload and deploy OSGi bundle to Virgo server, required options: `-f`
 * `status` - check status of bundle at Virgo server, required options: `-n`, `-v`
@@ -31,7 +31,7 @@ Script supports following commands:
 
 ### Options
 
-Following options are supported by script:
+Following options are supported by each script:
 
 * `-f` _path_ - location of OSGi bundle to upload, e.g. /opt/repo/org.slf4j.api-1.7.2.jar
 * `-n` _name_ - bundle symbolic name, e.g. org.slf4j.api
