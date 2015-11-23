@@ -114,14 +114,14 @@ deploy)
 		echo "Error: location of OSGi bundle is not specified, use option -f"
 		exit 1
 	fi
-	
+
 	if [ "${VERBOSE}" = "true" ]; then
 		echo "Uploading and deploying bundle: ${BUNDLE_FILE}"
 	fi
-	
+
 	# command
 	RESULT=`curl ${SILENT} -u ${VIRGO_USER} -F "file=@${BUNDLE_FILE}" ${VIRGO_URL}/admin/upload`
-	
+
 	if [ "${VERBOSE}" = "true" ]; then
 		echo "-------------------------"
 		echo "Virgo response: ${RESULT}"
@@ -162,14 +162,14 @@ status)
 		echo "Error: bundle version is not specified, use option -v"
 		exit 1
 	fi
-	
+
 	if [ "${VERBOSE}" = "true" ]; then
 		echo "Checking status of bundle: ${BUNDLE_NAME} version: ${BUNDLE_VERSION}"
 	fi
-	
+
 	# command
-	RESULT=`curl ${SILENT} -u ${VIRGO_USER} ${VIRGO_URL}/admin/jolokia/read/org.eclipse.virgo.kernel:artifact-type=${BUNDLE_TYPE},name=${BUNDLE_NAME},region=${BUNDLE_REGION},type=ArtifactModel,version=${BUNDLE_VERSION}`	
-	
+	RESULT=`curl ${SILENT} -u ${VIRGO_USER} ${VIRGO_URL}/admin/jolokia/read/org.eclipse.virgo.kernel:artifact-type=${BUNDLE_TYPE},name=${BUNDLE_NAME},region=${BUNDLE_REGION},type=ArtifactModel,version=${BUNDLE_VERSION}`
+
 	if [ "${VERBOSE}" = "true" ]; then
 		echo "-------------------------"
 		echo "Virgo response: ${RESULT}"
@@ -177,7 +177,7 @@ status)
 	fi
 
 	# analyze result
-	RESULT_STATUS=`echo "$RESULT" | grep -oEi ",\"status\":[0-9]*," | cut -c 11- | rev | cut -c 2- | rev`
+	RESULT_STATUS=`echo "$RESULT" | grep -oEi ",\"status\":[0-9]*" | cut -c 11- | rev | cut -c 1- | rev`
 	if [ -z "${RESULT}" ]; then
 		echo "Failure"
 		echo "Details: received empty result"
@@ -190,7 +190,7 @@ status)
 		if [ -z "${MESSAGE}" ]; then
 			MESSAGE=${RESULT}
 		fi
-		
+
 		echo "Failure"
 		echo "Details: ${MESSAGE}"
 		exit 2
@@ -201,16 +201,16 @@ status)
 list)
 	# command
 	RESULT=`curl ${SILENT} -u ${VIRGO_USER} ${VIRGO_URL}/admin/jolokia/search/org.eclipse.virgo.kernel:type=ArtifactModel,*`
-	
+
 	if [ "${VERBOSE}" = "true" ]; then
 		echo "-------------------------"
 		echo "Virgo response: ${RESULT}"
 		echo "-------------------------"
 	fi
-	
+
 	# extract result
 	RESULT=`echo "$RESULT" | grep -oEi "\"value\":\[.*\]" | cut -c 10- | rev | cut -c 2- | rev`
-	
+
 	if [ -z "${RESULT}" ]; then
 		echo "Failure"
 		echo "Details: received empty result"
@@ -229,10 +229,10 @@ list)
 		if [ ! -z "${BUNDLE_VERSION}" ]; then
 			FILTER_VERSION="version=${BUNDLE_VERSION},"
 		fi
-	
+
 		echo "$RESULT" | sed -e 's/\",\"/\"\'$'\n\"/g' | awk -F'["=,]' '{ print "name=" $5 ", version=" $11 ", type=" $3 ", region=" $7 }' | grep "${FILTER_TYPE}" | grep "${FILTER_NAME}" | grep "${FILTER_VERSION}"
 	fi
-	
+
 	;;
 ############################################
 # Execute command: stop, start, uninstall, refresh
@@ -245,11 +245,11 @@ stop|start|uninstall|refresh)
 		echo "Error: bundle version is not specified, use option -v"
 		exit 1
 	fi
-	
+
 	if [ "${VERBOSE}" = "true" ]; then
 		echo "Executing command: ${COMMAND} for bundle: ${BUNDLE_NAME} version: ${BUNDLE_VERSION}"
 	fi
-	
+
 	# command
 	RESULT=`curl ${SILENT} -u ${VIRGO_USER} ${VIRGO_URL}/admin/jolokia/exec/org.eclipse.virgo.kernel:artifact-type=${BUNDLE_TYPE},name=${BUNDLE_NAME},region=${BUNDLE_REGION},type=ArtifactModel,version=${BUNDLE_VERSION}/${COMMAND}`
 
@@ -258,9 +258,9 @@ stop|start|uninstall|refresh)
 		echo "Virgo response: ${RESULT}"
 		echo "-------------------------"
 	fi
-	
+
 	# analyze result
-	RESULT_STATUS=`echo "$RESULT" | grep -oEi ",\"status\":[0-9]*," | cut -c 11- | rev | cut -c 2- | rev`
+	RESULT_STATUS=`echo "$RESULT" | grep -oEi ",\"status\":[0-9]*" | cut -c 11- | rev | cut -c 1- | rev`
 	if [ -z "${RESULT}" ]; then
 		echo "Failure"
 		echo "Details: received empty result"
@@ -288,7 +288,7 @@ stop|start|uninstall|refresh)
 		if [ -z "${MESSAGE}" ]; then
 			MESSAGE=${RESULT}
 		fi
-		
+
 		echo "Failure"
 		echo "Details: ${MESSAGE}"
 		exit 2
